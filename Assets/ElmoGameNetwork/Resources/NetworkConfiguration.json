@@ -1,0 +1,13 @@
+{
+  "RabbitUsername": "nimbleknight",
+  "RabbitPassword": "1234",
+  "VirtualHost": "nimbleknight",
+  "HostName": "95.216.157.101",
+  "Port": 5672,
+  "QueuePrefix": "nkn.",
+  "OUT_Exchange": "nkn.Dispatcher.IN.EX",
+  "IN_Exchange" : "nkn.Dispatcher.OUT.EX",
+  "ServerRoutingKey":"dispatcher",
+
+}
+
