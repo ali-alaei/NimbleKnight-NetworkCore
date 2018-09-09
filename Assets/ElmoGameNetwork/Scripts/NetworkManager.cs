@@ -10,6 +10,8 @@ using RabbitMQ.Client.Events;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
+using System.Timers;
+
 namespace ElmoGameNetwork
 {
 
@@ -64,8 +66,12 @@ namespace ElmoGameNetwork
         public NetworkCore clientPrefab;
         private NetworkCore client;
         private ConnectionType connectionType;
-
-
+        private static Timer pingTimer;
+        //this will keep value of the last time that server responses.
+        private float lastPongTime; 
+        
+        //this will tell whether client is connected to server or not.
+        private bool isConnected = false;
 
         #endregion
 
@@ -74,11 +80,16 @@ namespace ElmoGameNetwork
 
         #endregion
 
+            
+            
+
         void Awake()
         {
             connectionType = ConnectionType.dispatcher;
             NetworkConfig.SetupFromFile();
             EstablishNewConnection();
+            pingTimer = new System.Timers.Timer();
+            pingTimer.Elapsed += OnPingTimerEvent;
 
         }
         void EstablishNewConnection()
@@ -121,7 +132,6 @@ namespace ElmoGameNetwork
             string status = result.GetField("status").str;
             string response = result.GetField("response").str;
             JSONObject content = result.GetField("content");
-
 //            if(response == "heartbeat")
 //            {
 //                HandleHeartBeat();
@@ -141,8 +151,14 @@ namespace ElmoGameNetwork
 
         private void HandleJoin()
         {
+            lastPongTime = Time.realtimeSinceStartup;
+            isConnected = true;
+            StartSendingPing();
+
 
         }
+
+        
 
         void SignUpAction(string username, string password)
         {
@@ -201,7 +217,7 @@ namespace ElmoGameNetwork
             connectionType = ConnectionType.worker;
             EstablishNewConnection();
             SignUpAction(Login_Username, Login_Password);
-        }
+        } 
         
         void SendToServer(JSONObject args, RequestType type, string request)
         {
@@ -213,6 +229,26 @@ namespace ElmoGameNetwork
             client.PublishMessage(message.ToString());
         }
         
+        private void StartSendingPing()
+        {
+            pingTimer.Stop();
+            pingTimer.Start();   
+        }
+
+        private void OnPingTimerEvent(object sender, ElapsedEventArgs e)
+        {
+            SendPing();
+
+        }
+
+        void SendPing()
+        {
+            
+            SendToServer(null, RequestType.heartbeat, "heartbeat");
+            
+        }
+        
+
         #region Messaging
         // Update is called once per frame
 
@@ -227,6 +263,7 @@ namespace ElmoGameNetwork
         {
             if(Input.GetKeyDown(KeyCode.Space))
             {
+                
             }
         }
 

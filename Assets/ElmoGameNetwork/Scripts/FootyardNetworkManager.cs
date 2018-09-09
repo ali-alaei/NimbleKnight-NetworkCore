@@ -37,7 +37,6 @@ namespace ElmoGameNetwork
         private string playerId = "1";
         NetworkCore client;
         public DEBUG_LEVEL debugLevel;
-
         private float lastPongTime;
         private Coroutine recennectCoRoutin;
         private Coroutine pingRoutin;
@@ -124,7 +123,8 @@ namespace ElmoGameNetwork
 
         private void onCouldentConnect()
         {
-            NotificationHandeler.present(NotificationHandeler.Keys.CouldNotConnectToSocket, NotificationHandeler.NotifType.Problem, 5);
+            NotificationHandeler.present(NotificationHandeler.Keys.CouldNotConnectToSocket, 
+                NotificationHandeler.NotifType.Problem, 5);
         }
 
         private void OnDestroy()
@@ -133,6 +133,7 @@ namespace ElmoGameNetwork
             pingTimer.Elapsed -= OnPingTimerEvent;
 
         }
+        
         private void OnApplicationQuit()
         {
             pingTimer.Stop();
@@ -202,8 +203,6 @@ namespace ElmoGameNetwork
         // Update is called once per frame
         public void SendServiceMessage(JSONObject content, Functions func, bool justSymmetricKey = false)
         {
-
-
             timer = new System.Diagnostics.Stopwatch();
             seqNumber++;
             JSONObject data = new JSONObject();
@@ -218,8 +217,6 @@ namespace ElmoGameNetwork
                 WriteToConsole("SendMessageToServer: " + data.ToString());
             timer.Start();
             client.PublishMessage(final.ToString());
-
-
         }
         public void SendExchangeMessage(JSONObject content, string opponent_id, Functions func, bool useAke = false)
         {
@@ -551,7 +548,6 @@ namespace ElmoGameNetwork
                     }
                 }
                 yield return new WaitForSeconds(Check_Ping_Intervel);
-
             }
         }
 

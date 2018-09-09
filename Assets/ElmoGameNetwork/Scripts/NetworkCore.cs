@@ -69,7 +69,8 @@ namespace ElmoGameNetwork
 
                 props.Headers["hmac"]= Encryption.GetHashString(messageBodyBytes, NetworkConfig.RabbitPassword);
 
-                channel_Send.BasicPublish(NetworkConfig.OUT_Exchange, NetworkConfig.ServerRoutingKey, props, messageBodyBytes);
+                channel_Send.BasicPublish(NetworkConfig.OUT_Exchange, NetworkConfig.ServerRoutingKey, 
+                    props, messageBodyBytes);
 
             }
             catch(Exception ex)
