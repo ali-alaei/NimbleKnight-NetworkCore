@@ -72,7 +72,11 @@ namespace ElmoGameNetwork
         
         //this will tell whether client is connected to server or not.
         private bool isConnected = false;
-
+        
+        private const int Sending_Ping_TimeOut = 20;
+        
+        private const int Check_Ping_Intervel = 2;
+        
         #endregion
 
         #region  EVENTS
@@ -92,6 +96,7 @@ namespace ElmoGameNetwork
             pingTimer.Elapsed += OnPingTimerEvent;
 
         }
+        
         void EstablishNewConnection()
         {
             if(client != null)
@@ -158,8 +163,6 @@ namespace ElmoGameNetwork
 
         }
 
-        
-
         void SignUpAction(string username, string password)
         {
             //callback to upperClass
@@ -187,6 +190,7 @@ namespace ElmoGameNetwork
         {
             SendToServer(null, RequestType.heartbeat, "heartbeat");
         }
+        
         void HandleNetworkDispatcher(JSONObject content)
         {
             string IP = content.GetField("ip").str;
@@ -225,7 +229,6 @@ namespace ElmoGameNetwork
             message.AddField("type", type.ToString());
             message.AddField("request", request);
             message.AddField("args", args);
-
             client.PublishMessage(message.ToString());
         }
         
@@ -247,7 +250,36 @@ namespace ElmoGameNetwork
             SendToServer(null, RequestType.heartbeat, "heartbeat");
             
         }
-        
+
+        IEnumerator CheckLastPong()
+        {
+            while (true)
+            {
+                if (isConnected)
+                {
+                    //to check whether client is connected to server or not.
+                    if (Time.realtimeSinceStartup - lastPongTime > Sending_Ping_TimeOut)
+                    {
+                        OnPingTimeOut();
+                    }
+                }
+                yield return new WaitForSeconds(Check_Ping_Intervel);
+            }
+        }
+
+        void OnPingTimeOut()
+        {
+            if (isConnected == true)
+            {
+                Debug.LogError("OnPingTimeOut: lastPongTime: "+ (Time.realtimeSinceStartup - lastPongTime));
+                //onDisconnectFunction?.Invoke();  //this will just declare some action to the upper
+                                                   //layer so further we can use it to do something
+                                                   //whenever this action is called. it's not needed by now.
+                isConnected = false;
+                client.ForceToReconnect();
+            }
+            
+        }
 
         #region Messaging
         // Update is called once per frame
