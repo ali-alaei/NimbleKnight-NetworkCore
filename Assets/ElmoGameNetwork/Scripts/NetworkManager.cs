@@ -40,6 +40,7 @@ namespace ElmoGameNetwork
             rest,
             non_rest,
             heartbeat,
+           
         }
         public enum ConnectionType
         {
@@ -75,7 +76,7 @@ namespace ElmoGameNetwork
         
         private const int Sending_Ping_TimeOut = 20;
         
-        private const int Check_Ping_Intervel = 2;
+        private const int Check_Ping_Intervel = 10;
         
         #endregion
 
@@ -241,14 +242,12 @@ namespace ElmoGameNetwork
         private void OnPingTimerEvent(object sender, ElapsedEventArgs e)
         {
             SendPing();
-
         }
 
         void SendPing()
         {
-            
             SendToServer(null, RequestType.heartbeat, "heartbeat");
-            
+            //SendToServer(null, RequestType.non_rest, "match_request");  //type of match request.
         }
 
         IEnumerator CheckLastPong()
@@ -293,10 +292,10 @@ namespace ElmoGameNetwork
 
         private void Update()
         {
-            if(Input.GetKeyDown(KeyCode.Space))
-            {
-                
-            }
+//            if(Input.GetKeyDown(KeyCode.Space))
+//            {
+//                
+//            }
         }
 
     }
